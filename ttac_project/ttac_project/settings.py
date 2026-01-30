@@ -80,14 +80,9 @@ WSGI_APPLICATION = 'ttac_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ttac_ad",
-        "USER": "root",
-        "PASSWORD": "123456",
-        "HOST": "localhost",
-        "PORT": "3306",
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
+    )
 }
 
 
