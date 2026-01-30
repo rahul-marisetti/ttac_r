@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:1050px; margin:auto;">
+
+  <!-- Page Header -->
+  <div style="margin-bottom:16px;">
+    <h2 style="margin:0; font-size:26px; color:#111827;">🔁 Transfer Market</h2>
+    <p style="margin:6px 0 0; color:#6b7280; font-weight:600;">
+      Buy verified tickets at the exact original price. Secure & safe transfers on <b>T-tac</b>.
+    </p>
+  </div>
+
+  <!-- ✅ Filters Card -->
+  <div style="
+      background:white;
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      border:1px solid #eef2f7;
+      margin-bottom:14px;
+  ">
+    <h3 style="margin:0 0 10px; font-size:16px; color:#111827;">
+      🔍 Filters (Optional)
+    </h3>
+
+    <form method="GET" style="
+        display:grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap:10px;
+        align-items:end;
+    ">
+
+      <!-- Movie -->
+      <div>
+        <label style="font-size:12px; font-weight:900; color:#111827;">Movie</label>
+        <input type="text" name="movie" value="{{ movie_q }}" placeholder="Eg: Leo"
+               style="
+                   width:100%;
+                   padding:10px 12px;
+                   border-radius:12px;
+                   border:1.5px solid #e5e7eb;
+                   outline:none;
+                   box-sizing:border-box;
+               ">
+      </div>
+
+      <!-- City -->
+      <div>
+        <label style="font-size:12px; font-weight:900; color:#111827;">City</label>
+        <input type="text" name="city" value="{{ city_q }}" placeholder="Eg: Chennai"
+               style="
+                   width:100%;
+                   padding:10px 12px;
+                   border-radius:12px;
+                   border:1.5px solid #e5e7eb;
+                   outline:none;
+                   box-sizing:border-box;
+               ">
+      </div>
+
+      <!-- Locality -->
+      <div>
+        <label style="font-size:12px; font-weight:900; color:#111827;">Locality</label>
+        <input type="text" name="locality" value="{{ locality_q }}" placeholder="Eg: Velachery"
+               style="
+                   width:100%;
+                   padding:10px 12px;
+                   border-radius:12px;
+                   border:1.5px solid #e5e7eb;
+                   outline:none;
+                   box-sizing:border-box;
+               ">
+      </div>
+
+      <!-- Theatre -->
+      <div>
+        <label style="font-size:12px; font-weight:900; color:#111827;">Theatre</label>
+        <input type="text" name="theatre" value="{{ theatre_q }}" placeholder="Eg: PVR"
+               style="
+                   width:100%;
+                   padding:10px 12px;
+                   border-radius:12px;
+                   border:1.5px solid #e5e7eb;
+                   outline:none;
+                   box-sizing:border-box;
+               ">
+      </div>
+
+      <!-- Tickets Count -->
+      <div>
+        <label style="font-size:12px; font-weight:900; color:#111827;">No. of Tickets</label>
+        <input type="number" name="tickets" value="{{ tickets_q }}" placeholder="Eg: 2" min="1"
+               style="
+                   width:100%;
+                   padding:10px 12px;
+                   border-radius:12px;
+                   border:1.5px solid #e5e7eb;
+                   outline:none;
+                   box-sizing:border-box;
+               ">
+      </div>
+
+      <!-- Buttons -->
+      <div style="display:flex; gap:10px;">
+        <button type="submit" style="
+            background:#2563eb;
+            color:white;
+            padding:10px 14px;
+            border-radius:12px;
+            font-weight:900;
+            border:none;
+            cursor:pointer;
+            width:100%;
+        ">
+          Apply
+        </button>
+
+        <a href="{% url 'resale_market' %}" style="
+            background:#111827;
+            color:white;
+            padding:10px 14px;
+            border-radius:12px;
+            font-weight:900;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            width:100%;
+        ">
+          Clear
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ✅ Tickets List -->
+  {% for r in resale_list %}
+
+    <!-- ✅ Expiry calculation (3 hours before showtime) -->
+    {% with expiry=r.ticket.show.show_time|date:"U" %}
+    {% endwith %}
+
+    <div style="
+        background:white;
+        border-radius:16px;
+        padding:16px;
+        box-shadow:0 6px 18px rgba(15,23,42,0.08);
+        border:1px solid #eef2f7;
+        margin-bottom:14px;
+    ">
+
+      <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+
+        <!-- Left Details -->
+        <div style="flex:1; min-width:250px;">
+          <h3 style="margin:0; font-size:18px; color:#111827;">
+            🎬 {{ r.ticket.show.movie.title }}
+          </h3>
+
+          <p style="margin:8px 0 0; color:#6b7280; font-weight:700;">
+            🕒 {{ r.ticket.show.show_time|date:"d M Y, h:i A" }}
+          </p>
+
+          <p style="margin:6px 0 0; color:#111827;">
+            <b>🏛 Theatre:</b> {{ r.ticket.show.theatre.name }}
+          </p>
+
+          <p style="margin:6px 0 0; color:#111827;">
+            <b>📍 Location:</b> {{ r.ticket.show.theatre.location }}
+          </p>
+
+          <p style="margin:6px 0 0; color:#111827;">
+            <b>🌆 City:</b> {{ r.ticket.show.theatre.city }}
+          </p>
+
+          <!-- ✅ Transfer Expiry Timer Text -->
+          <div style="margin-top:10px;">
+            {% with expiry_time=r.ticket.show.show_time|date:"U" %}
+              <span style="
+                  display:inline-block;
+                  background:#fef9c3;
+                  border:1px solid #fde68a;
+                  color:#854d0e;
+                  padding:6px 10px;
+                  border-radius:999px;
+                  font-weight:900;
+                  font-size:12px;
+              ">
+                ⏳ Transfer closes 3h before show
+              </span>
+            {% endwith %}
+          </div>
+
+          <p style="margin:10px 0 0; font-weight:900; color:#111827;">
+            💺 Seats ({{ r.ticket.seats.count }})
+          </p>
+
+          <div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
+            {% for s in r.ticket.seats.all %}
+              <span style="
+                  display:inline-block;
+                  background:#f3f4f6;
+                  padding:7px 10px;
+                  border-radius:10px;
+                  font-weight:900;
+                  color:#111827;
+                  font-size:13px;
+              ">
+                {{ s.seat_code }}
+              </span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Right Price + Button -->
+        <div style="min-width:210px; text-align:right;">
+
+          <div style="
+              display:inline-block;
+              padding:6px 12px;
+              border-radius:999px;
+              font-weight:900;
+              font-size:12px;
+              background:#eff6ff;
+              color:#1d4ed8;
+              border:1px solid #bfdbfe;
+          ">
+            Fixed Price
+          </div>
+
+          <p style="margin:10px 0 0; font-size:22px; font-weight:900; color:#111827;">
+            ₹{{ r.resale_price }}
+          </p>
+
+          <p style="margin:0; color:#6b7280; font-size:12px; font-weight:700;">
+            Exact original amount
+          </p>
+
+          <!-- ✅ Timer Display -->
+          <p class="expiryText"
+             data-showtime="{{ r.ticket.show.show_time|date:'Y-m-d\\TH:i:s' }}"
+             style="
+                margin:10px 0 0;
+                font-weight:900;
+                font-size:12px;
+                color:#2563eb;
+             ">
+            Calculating transfer time...
+          </p>
+
+          <!-- ✅ Buy Button -->
+          <a class="buyBtn"
+             href="{% url 'buy_resale_ticket' r.id %}"
+             style="
+                margin-top:12px;
+                width:100%;
+                background:#2563eb;
+                color:white;
+                padding:12px 16px;
+                border-radius:12px;
+                font-weight:900;
+                text-decoration:none;
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+             ">
+            Buy & Transfer
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+
+  {% empty %}
+    <div style="
+        background:white;
+        border-radius:16px;
+        padding:18px;
+        box-shadow:0 6px 18px rgba(15,23,42,0.08);
+        border:1px solid #eef2f7;
+    ">
+      <p style="margin:0; color:#6b7280; font-weight:800;">
+        No tickets available for transfer right now.
+      </p>
+    </div>
+  {% endfor %}
+
+</div>
+
+
+<script>
+  // ✅ Transfer expiry timer:
+  // You said resale closes 3 hours before show time.
+  // So expiry = showtime - 3 hours.
+  function formatDuration(ms) {
+    if (ms <= 0) return "Expired";
+
+    const totalMinutes = Math.floor(ms / (1000 * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+
+    if (hours > 0) return `Available for ${hours}h ${mins}m more`;
+    return `Available for ${mins}m more`;
+  }
+
+  document.querySelectorAll(".expiryText").forEach(el => {
+    const showTimeStr = el.getAttribute("data-showtime"); // "YYYY-MM-DDTHH:mm:ss"
+    const showTime = new Date(showTimeStr);
+
+    // ✅ expiry = showtime - 3 hours
+    const expiry = new Date(showTime.getTime() - (3 * 60 * 60 * 1000));
+
+    // find Buy button near this timer
+    const parentCard = el.closest("div").parentElement;
+    const buyBtn = parentCard.querySelector(".buyBtn");
+
+    function update() {
+      const now = new Date();
+      const left = expiry.getTime() - now.getTime();
+
+      if (left <= 0) {
+        el.innerHTML = "❌ Transfer closed";
+        el.style.color = "#dc2626";
+
+        if (buyBtn) {
+          buyBtn.style.background = "#9ca3af";
+          buyBtn.style.pointerEvents = "none";
+          buyBtn.style.cursor = "not-allowed";
+          buyBtn.innerHTML = "Closed";
+        }
+      } else {
+        el.innerHTML = "⏳ " + formatDuration(left);
+      }
+    }
+
+    update();
+    setInterval(update, 60000); // update every 1 minute
+  });
+</script>
+
+{% endblock %}

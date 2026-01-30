@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:1100px; margin:auto;">
+
+  <!-- Header -->
+  <div style="
+      background:white;
+      padding:16px;
+      border-radius:18px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      border:1px solid #eef2f7;
+      margin-bottom:14px;
+  ">
+    <h2 style="margin:0; font-size:24px; font-weight:900; color:#111827;">
+      💺 Select Seats
+    </h2>
+
+    <p style="margin:8px 0 0; color:#6b7280; font-weight:700;">
+      <b style="color:#111827;">{{ show.movie.title }}</b> |
+      {{ show.theatre.name }} |
+      ₹{{ show.price_per_seat }} per seat
+    </p>
+  </div>
+
+  <!-- Seat Layout Card -->
+  <div style="
+      background:white;
+      padding:16px;
+      border-radius:18px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      border:1px solid #eef2f7;
+  ">
+
+    <!-- Screen -->
+    <div style="text-align:center; margin-bottom:14px;">
+      <div style="
+          background:#f3f4f6;
+          padding:10px 14px;
+          border-radius:14px;
+          display:inline-block;
+          width:70%;
+          max-width:520px;
+          border:1px solid #e5e7eb;
+          box-shadow:inset 0 -2px 0 rgba(0,0,0,0.08);
+          font-weight:900;
+          color:#111827;
+      ">
+        SCREEN THIS WAY 🎥
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div style="
+        display:flex;
+        gap:12px;
+        justify-content:center;
+        flex-wrap:wrap;
+        margin-bottom:14px;
+        font-weight:800;
+        color:#6b7280;
+        font-size:13px;
+    ">
+      <span style="display:flex; gap:6px; align-items:center;">
+        <span style="width:16px; height:16px; border-radius:6px; background:#f3f4f6; border:1px solid #e5e7eb;"></span>
+        Available
+      </span>
+
+      <span style="display:flex; gap:6px; align-items:center;">
+        <span style="width:16px; height:16px; border-radius:6px; background:#2563eb;"></span>
+        Selected
+      </span>
+
+      <span style="display:flex; gap:6px; align-items:center;">
+        <span style="width:16px; height:16px; border-radius:6px; background:#9ca3af;"></span>
+        Booked
+      </span>
+    </div>
+
+    <form method="POST" id="seatForm">
+      {% csrf_token %}
+
+      <!-- ✅ Seat Map -->
+      <div style="
+          display:flex;
+          flex-direction:column;
+          gap:10px;
+          overflow-x:auto;
+          padding-bottom:10px;
+      ">
+
+        {# ✅ Group by row letter (A, B, C...) #}
+        {% regroup seats|dictsort:"seat_code" by seat_code|slice:":1" as seat_rows %}
+
+        {% for row in seat_rows %}
+          <div style="
+              display:grid;
+              grid-template-columns: 42px repeat({{ show.cols }}, 44px);
+              gap:8px;
+              align-items:center;
+              justify-content:start;
+              min-width: max-content;
+          ">
+
+            <!-- Row label -->
+            <div style="
+                font-weight:900;
+                color:#111827;
+                text-align:center;
+            ">
+              {{ row.grouper }}
+            </div>
+
+            {# ✅ FIXED ORDER: Sort by seat_code properly #}
+            {% for seat in row.list|dictsort:"seat_code" %}
+              {% if seat.is_booked %}
+                <div style="
+                    width:44px;
+                    height:38px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    border-radius:10px;
+                    background:#9ca3af;
+                    color:white;
+                    font-weight:900;
+                    font-size:12px;
+                    opacity:0.8;
+                    cursor:not-allowed;
+                " title="Booked">
+                  {{ seat.seat_code|slice:"1:" }}
+                </div>
+              {% else %}
+                <!-- Seat box -->
+                <div style="
+                    width:44px;
+                    height:38px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    border-radius:10px;
+                    background:#f3f4f6;
+                    border:1px solid #e5e7eb;
+                    color:#111827;
+                    font-weight:900;
+                    font-size:12px;
+                    cursor:pointer;
+                    user-select:none;
+                    transition:0.15s ease;
+                "
+                data-seat="{{ seat.seat_code }}"
+                onclick="toggleSeat('{{ seat.seat_code }}', this)"
+                onmouseover="if(!this.classList.contains('selectedSeat')){this.style.transform='scale(1.05)';}"
+                onmouseout="this.style.transform='scale(1)';"
+                title="Available">
+                  {{ seat.seat_code|slice:"1:" }}
+                </div>
+
+                <!-- Hidden checkbox -->
+                <input type="checkbox"
+                       name="seats"
+                       value="{{ seat.seat_code }}"
+                       id="seat-{{ seat.seat_code }}"
+                       style="display:none;">
+              {% endif %}
+            {% endfor %}
+
+          </div>
+        {% endfor %}
+
+      </div>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:16px 0;">
+
+      <!-- ✅ Selected seats summary -->
+      <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          flex-wrap:wrap;
+          gap:12px;
+          margin-bottom:14px;
+      ">
+        <div style="flex:1; min-width:260px;">
+          <p style="margin:0; font-weight:900; color:#111827;">Selected Seats</p>
+          <p id="selectedSeatsText" style="margin:6px 0 0; color:#6b7280; font-weight:800;">
+            None
+          </p>
+        </div>
+
+        <div style="min-width:220px; text-align:right;">
+          <p style="margin:0; font-weight:900; color:#111827;">Total Amount</p>
+          <p id="totalAmountText" style="margin:6px 0 0; font-size:18px; font-weight:900; color:#2563eb;">
+            ₹0
+          </p>
+        </div>
+      </div>
+
+      <!-- ✅ Payment method -->
+      <div style="
+          background:#f9fafb;
+          border:1px solid #eef2f7;
+          padding:14px;
+          border-radius:16px;
+          margin-bottom:14px;
+      ">
+        <h3 style="margin:0 0 10px; font-size:16px; font-weight:900; color:#111827;">
+          💳 Choose Payment Method
+        </h3>
+
+        <div style="display:flex; gap:14px; flex-wrap:wrap;">
+          <label style="
+              display:flex;
+              gap:8px;
+              align-items:center;
+              font-weight:900;
+              color:#111827;
+          ">
+            <input type="radio" name="pay_method" value="RAZORPAY" checked>
+            Pay with Razorpay
+          </label>
+
+          <label style="
+              display:flex;
+              gap:8px;
+              align-items:center;
+              font-weight:900;
+              color:#111827;
+          ">
+            <input type="radio" name="pay_method" value="WALLET">
+            Pay with Wallet
+            {% if wallet %}
+              <span style="
+                  margin-left:6px;
+                  background:#eff6ff;
+                  border:1px solid #bfdbfe;
+                  padding:4px 8px;
+                  border-radius:999px;
+                  font-size:12px;
+                  font-weight:900;
+                  color:#1d4ed8;
+              ">
+                Balance ₹{{ wallet.balance }}
+              </span>
+            {% endif %}
+          </label>
+        </div>
+
+        <p style="margin:10px 0 0; color:#6b7280; font-weight:700; font-size:12px;">
+          ✅ Wallet will be deducted instantly if balance is sufficient.
+        </p>
+      </div>
+
+      <!-- Continue -->
+      <button type="submit" style="
+          width:100%;
+          background:#2563eb;
+          color:white;
+          padding:12px 16px;
+          border-radius:14px;
+          font-weight:900;
+          border:none;
+          cursor:pointer;
+          font-size:15px;
+      ">
+        Continue
+      </button>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const pricePerSeat = parseFloat("{{ show.price_per_seat }}");
+
+  function toggleSeat(seatCode, element) {
+    const checkbox = document.getElementById("seat-" + seatCode);
+    if (!checkbox) return;
+
+    checkbox.checked = !checkbox.checked;
+
+    if (checkbox.checked) {
+      element.classList.add("selectedSeat");
+      element.style.background = "#2563eb";
+      element.style.color = "white";
+      element.style.border = "1px solid #2563eb";
+      element.style.transform = "scale(1.05)";
+    } else {
+      element.classList.remove("selectedSeat");
+      element.style.background = "#f3f4f6";
+      element.style.color = "#111827";
+      element.style.border = "1px solid #e5e7eb";
+      element.style.transform = "scale(1)";
+    }
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const checked = document.querySelectorAll("input[name='seats']:checked");
+    const seatCodes = Array.from(checked).map(x => x.value);
+
+    const total = seatCodes.length * pricePerSeat;
+
+    document.getElementById("selectedSeatsText").innerText =
+      seatCodes.length ? seatCodes.join(", ") : "None";
+
+    document.getElementById("totalAmountText").innerText =
+      "₹" + total;
+  }
+</script>
+
+{% endblock %}

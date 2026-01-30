@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:1150px; margin:auto;">
+
+  <!-- Header -->
+  <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:18px;
+  ">
+    <div>
+      <h1 style="margin:0; font-size:28px;">🎬 Now Showing</h1>
+      <p style="margin:6px 0 0; color:#6b7280;">
+        Book tickets and transfer safely — only on <b>T-tac</b>
+      </p>
+    </div>
+  </div>
+
+  <!-- ✅ Recommended Section -->
+  {% if user.is_authenticated %}
+    <div style="
+        background:white;
+        padding:16px;
+        border-radius:16px;
+        box-shadow:0 6px 18px rgba(15,23,42,0.08);
+        border:1px solid #eef2f7;
+        margin-bottom:18px;
+    ">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h2 style="margin:0; font-size:20px; font-weight:900; color:#111827;">
+            🎯 Recommended for You
+          </h2>
+          <p style="margin:6px 0 0; color:#6b7280; font-weight:700; font-size:13px;">
+            Based on your bookings, language, genre and ratings ✅
+          </p>
+        </div>
+      </div>
+
+      {% if recommended %}
+        <div style="
+            margin-top:14px;
+            display:grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap:14px;
+            align-items:stretch;
+        ">
+          {% for m in recommended %}
+            <div style="
+                background:#f9fafb;
+                padding:14px;
+                border-radius:16px;
+                border:1px solid #eef2f7;
+                display:flex;
+                flex-direction:column;
+                height:100%;
+            ">
+
+              <!-- Poster -->
+              {% if m.poster %}
+                <img src="{{ m.poster }}" style="
+                    width:100%;
+                    height:220px;
+                    object-fit:cover;
+                    border-radius:14px;
+                    border:1px solid #e5e7eb;
+                ">
+              {% else %}
+                <div style="
+                    width:100%;
+                    height:220px;
+                    background:#e5e7eb;
+                    border-radius:14px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-weight:900;
+                    color:#374151;
+                    border:1px solid #e5e7eb;
+                ">
+                  No Poster
+                </div>
+              {% endif %}
+
+              <div style="
+                  margin-top:12px;
+                  display:flex;
+                  flex-direction:column;
+                  flex:1;
+              ">
+                <h3 style="margin:0; font-size:16px; font-weight:900; color:#111827;">
+                  🎬 {{ m.title }}
+                </h3>
+
+                <p style="margin:8px 0 10px; color:#6b7280; font-weight:700; font-size:13px;">
+                  🌐 {{ m.language }} &nbsp; | &nbsp; 🎭 {{ m.genre }}
+                </p>
+
+                <a href="{% url 'movie_detail' m.id %}" style="
+                    margin-top:auto;
+                    width:100%;
+                    background:#2563eb;
+                    color:white;
+                    padding:10px 12px;
+                    border-radius:12px;
+                    font-weight:900;
+                    display:inline-flex;
+                    justify-content:center;
+                    align-items:center;
+                    text-decoration:none;
+                    box-sizing:border-box;
+                ">
+                  Book
+                </a>
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
+
+      {% else %}
+        <!-- ✅ Fallback if no recommendations -->
+        <div style="
+            margin-top:14px;
+            background:#f9fafb;
+            border:1px solid #eef2f7;
+            padding:14px;
+            border-radius:14px;
+        ">
+          <p style="margin:0; color:#6b7280; font-weight:800;">
+            ⭐ No recommendations yet. Book & rate a movie to get personalised suggestions!
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Search Bar -->
+  <div style="
+      background:white;
+      padding:14px;
+      border-radius:14px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      border:1px solid #eef2f7;
+      margin-bottom:18px;
+  ">
+    <form method="GET" style="
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        align-items:center;
+    ">
+      <input type="text" name="q"
+             placeholder="Search movies by name..."
+             value="{{ request.GET.q }}"
+             style="
+               flex:1;
+               min-width:240px;
+               padding:12px 14px;
+               border-radius:12px;
+               border:1.5px solid #e5e7eb;
+               outline:none;
+               font-size:14px;
+               box-sizing:border-box;
+             ">
+
+      <button type="submit"
+              style="
+                background:#2563eb;
+                color:white;
+                padding:12px 18px;
+                border-radius:12px;
+                font-weight:800;
+                border:none;
+                cursor:pointer;
+              ">
+        Search
+      </button>
+
+      {% if request.GET.q %}
+        <a href="/"
+           style="
+             background:#111827;
+             color:white;
+             padding:12px 18px;
+             border-radius:12px;
+             font-weight:800;
+             display:inline-flex;
+             align-items:center;
+             justify-content:center;
+             text-decoration:none;
+           ">
+          Clear
+        </a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Movie Grid -->
+  <div style="
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap:18px;
+      align-items:stretch;
+  ">
+    {% for movie in movies %}
+
+      <div style="
+          background:white;
+          padding:14px;
+          border-radius:16px;
+          box-shadow:0 6px 18px rgba(15,23,42,0.08);
+          border:1px solid #eef2f7;
+          display:flex;
+          flex-direction:column;
+          height:100%;
+      ">
+
+        <!-- Poster -->
+        {% if movie.poster %}
+          <img src="{{ movie.poster }}" style="
+              width:100%;
+              height:280px;
+              object-fit:cover;
+              border-radius:14px;
+              border:1px solid #e5e7eb;
+          ">
+        {% else %}
+          <div style="
+              width:100%;
+              height:280px;
+              background:#e5e7eb;
+              border-radius:14px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-weight:800;
+              color:#374151;
+              border:1px solid #e5e7eb;
+          ">
+            No Poster
+          </div>
+        {% endif %}
+
+        <!-- Content -->
+        <div style="
+            margin-top:12px;
+            display:flex;
+            flex-direction:column;
+            flex:1;
+        ">
+
+          <h3 style="margin:0; font-size:18px; font-weight:900; color:#111827;">
+            {{ movie.title }}
+          </h3>
+
+          <!-- ✅ Rating FIXED -->
+          <div style="
+              margin-top:8px;
+              display:flex;
+              align-items:center;
+              gap:8px;
+              flex-wrap:wrap;
+          ">
+            {% if movie.rating_count|default:0 > 0 %}
+              <span style="
+                  background:#ecfdf5;
+                  border:1px solid #86efac;
+                  color:#166534;
+                  padding:6px 10px;
+                  border-radius:999px;
+                  font-weight:900;
+                  font-size:12px;
+                  display:inline-flex;
+                  align-items:center;
+                  gap:6px;
+              ">
+                ⭐ {{ movie.avg_rating|floatformat:1 }}/5
+              </span>
+
+              <span style="color:#6b7280; font-weight:800; font-size:12px;">
+                ({{ movie.rating_count }} ratings)
+              </span>
+            {% else %}
+              <span style="color:#9ca3af; font-weight:800; font-size:12px;">
+                ⭐ No ratings yet
+              </span>
+            {% endif %}
+          </div>
+
+          <!-- Description -->
+          <p style="
+              margin:8px 0 10px;
+              color:#6b7280;
+              font-size:13px;
+              line-height:1.4;
+              min-height:44px;
+          ">
+            {% if movie.description %}
+              {{ movie.description|slice:":80" }}{% if movie.description|length > 80 %}...{% endif %}
+            {% else %}
+              <span style="color:#9ca3af; font-weight:700;">No description available.</span>
+            {% endif %}
+          </p>
+
+          <!-- Tags -->
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <span style="
+                background:#f3f4f6;
+                padding:6px 10px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:800;
+                color:#111827;
+            ">
+              🌐 {{ movie.language }}
+            </span>
+
+            <span style="
+                background:#f3f4f6;
+                padding:6px 10px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:800;
+                color:#111827;
+            ">
+              🎭 {{ movie.genre }}
+            </span>
+          </div>
+
+          <!-- Book Button pinned bottom -->
+          <a href="{% url 'movie_detail' movie.id %}"
+             style="
+                width:100%;
+                background:#2563eb;
+                color:white;
+                padding:12px 16px;
+                border-radius:12px;
+                font-weight:900;
+                display:inline-flex;
+                justify-content:center;
+                align-items:center;
+                text-decoration:none;
+                margin-top:auto;
+                box-sizing:border-box;
+             ">
+            Book
+          </a>
+
+        </div>
+      </div>
+
+    {% empty %}
+      <div style="
+          background:white;
+          padding:18px;
+          border-radius:14px;
+          box-shadow:0 6px 18px rgba(15,23,42,0.08);
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; color:#6b7280; font-weight:800;">
+          No movies found.
+        </p>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

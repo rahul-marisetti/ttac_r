@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:1150px; margin:auto;">
+
+  <!-- ✅ Top section -->
+  <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start;">
+
+    <!-- Movie Poster + Info -->
+    <div style="flex:1; min-width:260px; max-width:330px;">
+      <div style="
+          background:white;
+          border-radius:18px;
+          padding:14px;
+          box-shadow:0 6px 18px rgba(15,23,42,0.08);
+          border:1px solid #eef2f7;
+      ">
+        {% if movie.poster %}
+          <img src="{{ movie.poster }}" style="
+              width:100%;
+              height:360px;
+              object-fit:cover;
+              border-radius:14px;
+              border:1px solid #e5e7eb;
+          ">
+        {% else %}
+          <div style="
+              width:100%;
+              height:360px;
+              background:#e5e7eb;
+              border-radius:14px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-weight:900;
+              color:#111827;
+          ">
+            No Poster
+          </div>
+        {% endif %}
+
+        <h2 style="margin:12px 0 6px; font-size:22px; font-weight:900; color:#111827;">
+          {{ movie.title }}
+        </h2>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <span style="
+              background:#eff6ff;
+              border:1px solid #bfdbfe;
+              color:#1d4ed8;
+              padding:6px 10px;
+              border-radius:999px;
+              font-weight:900;
+              font-size:12px;
+          ">
+            🌐 {{ movie.language }}
+          </span>
+
+          <span style="
+              background:#f3f4f6;
+              border:1px solid #e5e7eb;
+              color:#111827;
+              padding:6px 10px;
+              border-radius:999px;
+              font-weight:900;
+              font-size:12px;
+          ">
+            🎭 {{ movie.genre }}
+          </span>
+
+          <span style="
+              background:#f3f4f6;
+              border:1px solid #e5e7eb;
+              color:#111827;
+              padding:6px 10px;
+              border-radius:999px;
+              font-weight:900;
+              font-size:12px;
+          ">
+            ⏱ {{ movie.duration_mins }} mins
+          </span>
+        </div>
+
+        <p style="margin:0; color:#6b7280; font-weight:700; line-height:1.5; font-size:13px;">
+          {{ movie.description }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Theatre + Show Timings -->
+    <div style="flex:2; min-width:340px;">
+      <div style="
+          background:white;
+          border-radius:18px;
+          padding:16px;
+          box-shadow:0 6px 18px rgba(15,23,42,0.08);
+          border:1px solid #eef2f7;
+      ">
+
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+          <div>
+            <h3 style="margin:0; font-size:18px; font-weight:900; color:#111827;">
+              Select Theatre & Show Time
+            </h3>
+            <p style="margin:6px 0 0; color:#6b7280; font-weight:700; font-size:13px;">
+              Choose a date and select a theatre to continue booking.
+            </p>
+          </div>
+
+          <a href="{% url 'home' %}" style="
+              background:#111827;
+              color:white;
+              padding:10px 14px;
+              border-radius:12px;
+              font-weight:900;
+              text-decoration:none;
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+          ">
+            Back
+          </a>
+        </div>
+
+        <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+        <!-- ✅ Real Date Tabs (Generated via JS) -->
+        <div id="dateTabs" style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-bottom:14px;
+        "></div>
+
+        <!-- ✅ Theatre Search Bar -->
+        <div style="
+            background:#f9fafb;
+            border:1px solid #eef2f7;
+            padding:12px;
+            border-radius:16px;
+            margin-bottom:14px;
+        ">
+          <label style="font-weight:900; font-size:13px; color:#111827; display:block; margin-bottom:6px;">
+            🔍 Search Theatre
+          </label>
+          <input id="theatreSearch" type="text" placeholder="Type theatre name or locality..."
+                 style="
+                    width:100%;
+                    padding:12px 14px;
+                    border-radius:12px;
+                    border:1.5px solid #e5e7eb;
+                    outline:none;
+                    font-size:14px;
+                    box-sizing:border-box;
+                 ">
+        </div>
+
+        {% if shows %}
+          {% regroup shows by theatre as theatre_groups %}
+
+          <div id="theatreWrapper" style="display:flex; flex-direction:column; gap:12px;">
+            {% for group in theatre_groups %}
+              <div class="theatreCard"
+                   data-theatre="{{ group.grouper.name|lower }} {{ group.grouper.location|lower }} {{ group.grouper.city|lower }}"
+                   style="
+                      padding:14px;
+                      border:1px solid #e5e7eb;
+                      border-radius:18px;
+                      background:white;
+                   ">
+
+                <!-- Theatre Header -->
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                  <div>
+                    <h4 style="margin:0; font-size:16px; font-weight:900; color:#111827;">
+                      {{ group.grouper.name }}
+                    </h4>
+                    <p style="margin:4px 0 0; color:#6b7280; font-size:13px; font-weight:700;">
+                      📍 {{ group.grouper.location }} ({{ group.grouper.city }})
+                    </p>
+                  </div>
+
+                  <span style="
+                      background:#ecfdf5;
+                      border:1px solid #86efac;
+                      color:#166534;
+                      padding:6px 10px;
+                      border-radius:999px;
+                      font-weight:900;
+                      font-size:12px;
+                  ">
+                    ✅ Available
+                  </span>
+                </div>
+
+                <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+                <!-- Show Timings Chips -->
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  {% for show in group.list %}
+                    <a class="showChip"
+                       data-show-datetime="{{ show.show_time|date:'Y-m-d\\TH:i:s' }}"
+                       href="{% url 'seat_select' show.id %}"
+                       style="
+                          padding:10px 14px;
+                          border-radius:14px;
+                          border:1.8px solid #2563eb;
+                          color:#2563eb;
+                          font-weight:900;
+                          background:white;
+                          text-decoration:none;
+                          display:inline-flex;
+                          align-items:center;
+                          gap:8px;
+                          transition:0.15s;
+                       "
+                       onmouseover="this.style.background='#2563eb'; this.style.color='white';"
+                       onmouseout="this.style.background='white'; this.style.color='#2563eb';"
+                    >
+                      🕒 {{ show.show_time|date:"h:i A" }}
+                      <span style="font-weight:800; font-size:12px; opacity:0.9;">
+                        ₹{{ show.price_per_seat }}
+                      </span>
+                    </a>
+                  {% endfor %}
+                </div>
+
+              </div>
+            {% endfor %}
+          </div>
+
+        {% else %}
+          <p style="color:#6b7280; font-weight:700;">No shows available for this movie right now.</p>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ✅ Create Date Tabs like BookMyShow (Today + next 6 days)
+  const dateTabsContainer = document.getElementById("dateTabs");
+
+  function formatTabLabel(dateObj) {
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const dayName = days[dateObj.getDay()];
+    const dayNum = String(dateObj.getDate()).padStart(2, "0");
+    return `${dayName} ${dayNum}`;
+  }
+
+  function formatYYYYMMDD(dateObj) {
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const d = String(dateObj.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function buildDateTabs() {
+    dateTabsContainer.innerHTML = "";
+
+    const today = new Date();
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "dateTab";
+      btn.setAttribute("data-date", formatYYYYMMDD(d));
+      btn.innerText = (i === 0) ? `Today • ${formatTabLabel(d)}` : formatTabLabel(d);
+
+      btn.style.border = "none";
+      btn.style.cursor = "pointer";
+      btn.style.padding = "10px 12px";
+      btn.style.borderRadius = "14px";
+      btn.style.fontWeight = "900";
+      btn.style.background = (i === 0) ? "#2563eb" : "#f3f4f6";
+      btn.style.color = (i === 0) ? "white" : "#111827";
+
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".dateTab").forEach(x => {
+          x.style.background = "#f3f4f6";
+          x.style.color = "#111827";
+        });
+
+        btn.style.background = "#2563eb";
+        btn.style.color = "white";
+
+        filterShowsByDate(btn.getAttribute("data-date"));
+      });
+
+      dateTabsContainer.appendChild(btn);
+    }
+  }
+
+  // ✅ Filter shows by date (YYYY-MM-DD)
+  function filterShowsByDate(targetDateStr) {
+    document.querySelectorAll(".theatreCard").forEach(card => {
+      const chips = card.querySelectorAll(".showChip");
+      let anyVisible = false;
+
+      chips.forEach(chip => {
+        const dt = chip.getAttribute("data-show-datetime"); // YYYY-MM-DDTHH:mm:ss
+        const dateOnly = dt.split("T")[0];
+
+        if (dateOnly === targetDateStr) {
+          chip.style.display = "inline-flex";
+          anyVisible = true;
+        } else {
+          chip.style.display = "none";
+        }
+      });
+
+      card.style.display = anyVisible ? "block" : "none";
+    });
+  }
+
+  // ✅ Initialise tabs + default date filter = Today
+  buildDateTabs();
+  filterShowsByDate(formatYYYYMMDD(new Date()));
+
+  // ✅ Theatre Search Filter
+  const theatreSearch = document.getElementById("theatreSearch");
+  theatreSearch.addEventListener("input", function () {
+    const q = this.value.toLowerCase().trim();
+
+    document.querySelectorAll(".theatreCard").forEach(card => {
+      const text = card.getAttribute("data-theatre");
+      card.style.display = text.includes(q) ? "block" : "none";
+    });
+  });
+</script>
+
+{% endblock %}

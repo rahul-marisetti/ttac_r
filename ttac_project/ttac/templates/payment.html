@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="
+    min-height: calc(100vh - 110px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+">
+
+  <div style="
+      width:100%;
+      max-width:560px;
+      background:white;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 8px 24px rgba(15,23,42,0.10);
+      border:1px solid #eef2f7;
+  ">
+
+    <h2 style="
+        margin:0;
+        text-align:center;
+        font-size:22px;
+        font-weight:900;
+        color:#111827;
+    ">
+      💳 Pay with Razorpay
+    </h2>
+
+    <p style="
+        margin:8px 0 0;
+        text-align:center;
+        color:#6b7280;
+        font-weight:700;
+        font-size:13px;
+    ">
+      Secure payment for your movie booking on <b>T-tac</b>
+    </p>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- ✅ CSRF Token for JS -->
+    <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+
+    <!-- Ticket Summary -->
+    <div style="
+        background:#f9fafb;
+        border:1px solid #eef2f7;
+        padding:14px;
+        border-radius:16px;
+        margin-bottom:14px;
+    ">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        🎬 Movie
+      </p>
+      <p style="margin:6px 0 0; font-weight:800; color:#6b7280;">
+        {{ ticket.show.movie.title }}
+      </p>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        🕒 Show Time
+      </p>
+      <p style="margin:6px 0 0; font-weight:800; color:#6b7280;">
+        {{ ticket.show.show_time|date:"d M Y, h:i A" }}
+      </p>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        💺 Seats
+      </p>
+
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+        {% for s in ticket.seats.all %}
+          <span style="
+              display:inline-block;
+              background:white;
+              padding:7px 10px;
+              border-radius:10px;
+              font-weight:900;
+              border:1px solid #e5e7eb;
+              color:#111827;
+              font-size:13px;
+          ">
+            {{ s.seat_code }}
+          </span>
+        {% endfor %}
+      </div>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <p style="margin:0; font-weight:900; color:#111827;">
+            Total Amount
+          </p>
+          <p style="margin:6px 0 0; font-weight:700; font-size:12px; color:#6b7280;">
+            Including all charges
+          </p>
+        </div>
+
+        <div style="
+            background:#eff6ff;
+            border:1px solid #bfdbfe;
+            padding:10px 14px;
+            border-radius:14px;
+            font-weight:900;
+            font-size:20px;
+            color:#111827;
+        ">
+          ₹{{ ticket.total_price }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pay Button -->
+    <button id="rzp-button1" style="
+        width:100%;
+        background:#2563eb;
+        color:white;
+        padding:12px 16px;
+        border-radius:14px;
+        font-weight:900;
+        border:none;
+        cursor:pointer;
+        font-size:15px;
+    ">
+      Pay Now
+    </button>
+
+    <!-- Back Button -->
+    <a href="{% url 'home' %}" style="
+        margin-top:10px;
+        width:100%;
+        background:#111827;
+        color:white;
+        padding:12px 16px;
+        border-radius:14px;
+        font-weight:900;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        box-sizing:border-box;
+    ">
+      Back to Home
+    </a>
+
+    <p style="
+        margin:12px 0 0;
+        text-align:center;
+        font-size:12px;
+        color:#6b7280;
+        font-weight:700;
+    ">
+      🔒 Powered by Razorpay • Safe & Secure
+    </p>
+
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+var options = {
+  "key": "{{ razorpay_key }}",
+  "amount": "{{ ticket.total_price }}00",
+  "currency": "INR",
+  "name": "T-tac",
+  "description": "Movie Ticket Booking",
+  "order_id": "{{ payment.razorpay_order_id }}",
+
+  "handler": function (response) {
+
+    var form = document.createElement("form");
+    form.method = "POST";
+
+    // ✅ FIXED URL NAME
+    form.action = "{% url 'payment_success' ticket.id %}";
+
+    var csrf = document.createElement("input");
+    csrf.type = "hidden";
+    csrf.name = "csrfmiddlewaretoken";
+    csrf.value = document.getElementById("csrfToken").value;
+    form.appendChild(csrf);
+
+    var payId = document.createElement("input");
+    payId.type = "hidden";
+    payId.name = "razorpay_payment_id";
+    payId.value = response.razorpay_payment_id;
+    form.appendChild(payId);
+
+    var orderId = document.createElement("input");
+    orderId.type = "hidden";
+    orderId.name = "razorpay_order_id";
+    orderId.value = response.razorpay_order_id;
+    form.appendChild(orderId);
+
+    var sig = document.createElement("input");
+    sig.type = "hidden";
+    sig.name = "razorpay_signature";
+    sig.value = response.razorpay_signature;
+    form.appendChild(sig);
+
+    document.body.appendChild(form);
+    form.submit();
+  },
+
+  "theme": { "color": "#2563eb" }
+};
+
+var rzp1 = new Razorpay(options);
+
+document.getElementById('rzp-button1').onclick = function(e){
+  rzp1.open();
+  e.preventDefault();
+}
+</script>
+
+{% endblock %}

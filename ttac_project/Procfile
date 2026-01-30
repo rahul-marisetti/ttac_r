@@ -1,0 +1,1 @@
+web: gunicorn ttac_project.wsgi:application

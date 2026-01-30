@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>T-tac</title>
+</head>
+
+<body style="
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f6f7fb;
+">
+
+<!-- ✅ Navbar -->
+<header style="
+    height:70px;
+    background:#111827;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+    position:sticky;
+    top:0;
+    z-index:1000;
+">
+
+    <!-- Logo -->
+    <div style="display:flex; align-items:center; gap:10px;">
+        <h2 style="
+            margin:0;
+            color:white;
+            font-size:20px;
+            font-weight:900;
+            letter-spacing:0.5px;
+        ">
+            T-tac 🎬
+        </h2>
+    </div>
+
+    <!-- Nav Links -->
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+
+        <!-- Home -->
+        <a href="/"
+           style="
+               color:white;
+               text-decoration:none;
+               font-weight:800;
+               padding:8px 12px;
+               border-radius:10px;
+               transition:0.2s;
+           "
+           onmouseover="this.style.background='#1f2937'"
+           onmouseout="this.style.background='transparent'"
+        >
+           Home
+        </a>
+
+        {% if user.is_authenticated %}
+
+            <!-- My Tickets -->
+            <a href="/mytickets/"
+               style="
+                   color:white;
+                   text-decoration:none;
+                   font-weight:800;
+                   padding:8px 12px;
+                   border-radius:10px;
+                   transition:0.2s;
+               "
+               onmouseover="this.style.background='#1f2937'"
+               onmouseout="this.style.background='transparent'"
+            >
+                My Tickets
+            </a>
+
+            <!-- Transfer Market -->
+            <a href="/resale/"
+               style="
+                   color:white;
+                   text-decoration:none;
+                   font-weight:800;
+                   padding:8px 12px;
+                   border-radius:10px;
+                   transition:0.2s;
+               "
+               onmouseover="this.style.background='#1f2937'"
+               onmouseout="this.style.background='transparent'"
+            >
+                Transfer Market
+            </a>
+
+            <!-- Wallet -->
+            <a href="/wallet/"
+               style="
+                   color:white;
+                   text-decoration:none;
+                   font-weight:800;
+                   padding:8px 12px;
+                   border-radius:10px;
+                   transition:0.2s;
+               "
+               onmouseover="this.style.background='#1f2937'"
+               onmouseout="this.style.background='transparent'"
+            >
+                Wallet
+            </a>
+
+            <!-- User Name -->
+            <span style="
+                color:#e5e7eb;
+                font-weight:800;
+                margin-left:8px;
+                padding:7px 12px;
+                border-radius:999px;
+                background:#1f2937;
+                border:1px solid rgba(255,255,255,0.12);
+            ">
+                Hi, {{ user.username }}
+            </span>
+
+            <!-- Logout -->
+            <a href="/logout/"
+               style="
+                   background:#2563eb;
+                   color:white;
+                   text-decoration:none;
+                   font-weight:900;
+                   padding:9px 14px;
+                   border-radius:12px;
+                   display:inline-flex;
+                   align-items:center;
+                   justify-content:center;
+               "
+            >
+                Logout
+            </a>
+
+        {% else %}
+
+            <!-- Login -->
+            <a href="/login/"
+               style="
+                   color:white;
+                   text-decoration:none;
+                   font-weight:800;
+                   padding:8px 12px;
+                   border-radius:10px;
+                   transition:0.2s;
+               "
+               onmouseover="this.style.background='#1f2937'"
+               onmouseout="this.style.background='transparent'"
+            >
+                Login
+            </a>
+
+            <!-- Signup -->
+            <a href="/signup/"
+               style="
+                   background:#2563eb;
+                   color:white;
+                   text-decoration:none;
+                   font-weight:900;
+                   padding:9px 14px;
+                   border-radius:12px;
+                   display:inline-flex;
+                   align-items:center;
+                   justify-content:center;
+               "
+            >
+                Signup
+            </a>
+
+        {% endif %}
+    </div>
+</header>
+
+<!-- ✅ Main Container -->
+<div style="
+    max-width:1200px;
+    margin: 20px auto;
+    padding: 0 18px;
+">
+
+    <!-- Messages -->
+    {% if messages %}
+        <div style="margin-bottom:14px;">
+        {% for message in messages %}
+            <div style="
+                background:white;
+                border-left:6px solid #2563eb;
+                padding:12px 14px;
+                border-radius:12px;
+                box-shadow:0 6px 18px rgba(15,23,42,0.08);
+                font-weight:700;
+                color:#111827;
+                margin-bottom:10px;
+            ">
+                {{ message }}
+            </div>
+        {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

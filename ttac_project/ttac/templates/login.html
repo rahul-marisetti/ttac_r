@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="
+    min-height: calc(100vh - 110px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+">
+
+  <div style="
+      width: 100%;
+      max-width: 450px;
+      background: white;
+      padding: 18px;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+      border:1px solid #eef2f7;
+  ">
+
+    <h2 style="
+        text-align:center;
+        margin:0;
+        font-size:22px;
+        font-weight:900;
+        color:#111827;
+    ">
+      Login
+    </h2>
+
+    <p style="
+        text-align:center;
+        margin:8px 0 16px;
+        color:#6b7280;
+        font-weight:700;
+        font-size:13px;
+    ">
+      Welcome back to <b>T-tac</b> 🎬
+    </p>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div style="margin-bottom:12px;">
+        <label style="
+            font-weight:900;
+            display:block;
+            margin-bottom:6px;
+            color:#111827;
+            font-size:13px;
+        ">
+          Username
+        </label>
+
+        <input name="username" placeholder="Enter your username" required
+               style="
+                  width:100%;
+                  padding:12px 14px;
+                  border:1.5px solid #e5e7eb;
+                  border-radius:12px;
+                  outline:none;
+                  font-size:14px;
+                  box-sizing:border-box;
+               ">
+      </div>
+
+      <div style="margin-bottom:10px;">
+        <label style="
+            font-weight:900;
+            display:block;
+            margin-bottom:6px;
+            color:#111827;
+            font-size:13px;
+        ">
+          Password
+        </label>
+
+        <input name="password" type="password" placeholder="Enter your password" required
+               style="
+                  width:100%;
+                  padding:12px 14px;
+                  border:1.5px solid #e5e7eb;
+                  border-radius:12px;
+                  outline:none;
+                  font-size:14px;
+                  box-sizing:border-box;
+               ">
+      </div>
+
+      <!-- ✅ Forgot Password 
+      <div style="text-align:right; margin-bottom:14px;">
+        <a href="{% url 'password_reset' %}" style="
+            color:#2563eb;
+            font-weight:900;
+            font-size:13px;
+            text-decoration:none;
+        ">
+          Forgot Password?
+        </a>
+      </div>-->
+
+      <div style="
+          display:flex;
+          justify-content:center;
+          gap:10px;
+          margin-top:12px;
+          flex-wrap:wrap;
+      ">
+        <button type="submit"
+                style="
+                    background:#2563eb;
+                    color:white;
+                    padding:12px 16px;
+                    border-radius:12px;
+                    font-weight:900;
+                    border:none;
+                    cursor:pointer;
+                    min-width:140px;
+                ">
+          Login
+        </button>
+
+        <a href="/"
+           style="
+              background:#111827;
+              color:white;
+              padding:12px 16px;
+              border-radius:12px;
+              font-weight:900;
+              display:inline-flex;
+              justify-content:center;
+              align-items:center;
+              text-decoration:none;
+              min-width:120px;
+           ">
+          Back
+        </a>
+      </div>
+    </form>
+
+    <p style="
+        text-align:center;
+        margin-top:14px;
+        color:#6b7280;
+        font-weight:700;
+        font-size:13px;
+    ">
+      New user?
+      <a href="/signup/" style="color:#2563eb; font-weight:900; text-decoration:none;">
+        Create an account
+      </a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "ttac/base.html" %}
+{% block content %}
+
+<div style="
+    min-height: calc(100vh - 110px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+">
+
+  <div style="
+      width:100%;
+      max-width:560px;
+      background:white;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 8px 24px rgba(15,23,42,0.10);
+      border:1px solid #eef2f7;
+  ">
+
+    <h2 style="
+        margin:0;
+        text-align:center;
+        font-size:22px;
+        font-weight:900;
+        color:#111827;
+    ">
+      🔁 Confirm Ticket Transfer
+    </h2>
+
+    <p style="
+        margin:8px 0 0;
+        text-align:center;
+        color:#6b7280;
+        font-weight:700;
+        font-size:13px;
+    ">
+      Please confirm the details before continuing to payment.
+    </p>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- Ticket Summary -->
+    <div style="
+        background:#f9fafb;
+        border:1px solid #eef2f7;
+        padding:14px;
+        border-radius:16px;
+        margin-bottom:14px;
+    ">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        🎟️ Booking ID
+      </p>
+      <p style="margin:6px 0 0; font-weight:800; color:#6b7280;">
+        #{{ resale.ticket.id }}
+      </p>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        🎬 Movie
+      </p>
+      <p style="margin:6px 0 0; font-weight:800; color:#6b7280;">
+        {{ resale.ticket.show.movie.title }}
+      </p>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        🕒 Show Time
+      </p>
+      <p style="margin:6px 0 0; font-weight:800; color:#6b7280;">
+        {{ resale.ticket.show.show_time|date:"d M Y, h:i A" }}
+      </p>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <p style="margin:0; font-weight:900; color:#111827;">
+        💺 Seats
+      </p>
+
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+        {% for s in resale.ticket.seats.all %}
+          <span style="
+              display:inline-block;
+              background:white;
+              padding:7px 10px;
+              border-radius:10px;
+              font-weight:900;
+              border:1px solid #e5e7eb;
+              color:#111827;
+              font-size:13px;
+          ">
+            {{ s.seat_code }}
+          </span>
+        {% endfor %}
+      </div>
+
+      <hr style="border:none; height:1px; background:#e5e7eb; margin:12px 0;">
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <p style="margin:0; font-weight:900; color:#111827;">
+            Pay Amount
+          </p>
+          <p style="margin:6px 0 0; font-weight:700; font-size:12px; color:#6b7280;">
+            Fixed price (same as original)
+          </p>
+        </div>
+
+        <div style="
+            background:#eff6ff;
+            border:1px solid #bfdbfe;
+            padding:10px 14px;
+            border-radius:14px;
+            font-weight:900;
+            font-size:20px;
+            color:#111827;
+        ">
+          ₹{{ resale.resale_price }}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Note -->
+    <div style="
+        background:#eff6ff;
+        border:1px solid #bfdbfe;
+        padding:12px;
+        border-radius:14px;
+        margin-bottom:14px;
+        font-size:13px;
+        color:#1d4ed8;
+        font-weight:800;
+    ">
+      ✅ After successful payment, this ticket will be transferred to your account instantly.
+    </div>
+
+    <!-- Buttons -->
+    <form method="POST" style="display:flex; gap:10px; flex-wrap:wrap;">
+      {% csrf_token %}
+
+      <button type="submit" style="
+          flex:1;
+          min-width:200px;
+          background:#2563eb;
+          color:white;
+          padding:12px 16px;
+          border-radius:14px;
+          font-weight:900;
+          border:none;
+          cursor:pointer;
+          font-size:14px;
+      ">
+        Confirm Payment & Transfer
+      </button>
+
+      <a href="{% url 'resale_market' %}" style="
+          flex:1;
+          min-width:160px;
+          background:#111827;
+          color:white;
+          padding:12px 16px;
+          border-radius:14px;
+          font-weight:900;
+          text-decoration:none;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+      ">
+        Back
+      </a>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

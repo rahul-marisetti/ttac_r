@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:920px; margin:auto;">
+
+  <!-- Header Card -->
+  <div style="
+      background:white;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      border:1px solid #eef2f7;
+      margin-bottom:14px;
+  ">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+      <div>
+        <h2 style="margin:0; font-size:24px; color:#111827;">🎟️ Booking Details</h2>
+        <p style="margin:8px 0 0; color:#6b7280; font-weight:700;">
+          Booking ID: <span style="color:#111827; font-weight:900;">#{{ ticket.id }}</span>
+        </p>
+      </div>
+
+      <!-- Status badge -->
+      <div style="
+          padding:8px 14px;
+          border-radius:999px;
+          font-weight:900;
+          font-size:12px;
+          background:#eff6ff;
+          border:1px solid #bfdbfe;
+          color:#1d4ed8;
+          height:max-content;
+      ">
+        {{ ticket.status }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Details Card -->
+  <div style="
+      background:white;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      border:1px solid #eef2f7;
+  ">
+
+    <!-- Movie title -->
+    <div style="margin-bottom:12px;">
+      <h3 style="margin:0; font-size:20px; color:#111827;">
+        🎬 {{ ticket.show.movie.title }}
+      </h3>
+
+      <p style="margin:8px 0 0; color:#6b7280; font-weight:700;">
+        Language: <span style="color:#111827; font-weight:900;">{{ ticket.show.movie.language }}</span>
+        &nbsp; | &nbsp;
+        Genre: <span style="color:#111827; font-weight:900;">{{ ticket.show.movie.genre }}</span>
+      </p>
+    </div>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- Show Details -->
+    <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    ">
+      <div style="
+          background:#f9fafb;
+          padding:12px;
+          border-radius:14px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; color:#6b7280; font-weight:800;">📅 Date</p>
+        <p style="margin:6px 0 0; color:#111827; font-weight:900;">
+          {{ ticket.show.show_time|date:"d M Y" }}
+        </p>
+      </div>
+
+      <div style="
+          background:#f9fafb;
+          padding:12px;
+          border-radius:14px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; color:#6b7280; font-weight:800;">🕒 Time</p>
+        <p style="margin:6px 0 0; color:#111827; font-weight:900;">
+          {{ ticket.show.show_time|date:"h:i A" }}
+        </p>
+      </div>
+
+      <div style="
+          background:#f9fafb;
+          padding:12px;
+          border-radius:14px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; color:#6b7280; font-weight:800;">🏛 Theatre</p>
+        <p style="margin:6px 0 0; color:#111827; font-weight:900;">
+          {{ ticket.show.theatre.name }}
+        </p>
+      </div>
+
+      <div style="
+          background:#f9fafb;
+          padding:12px;
+          border-radius:14px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; color:#6b7280; font-weight:800;">📍 Locality</p>
+        <p style="margin:6px 0 0; color:#111827; font-weight:900;">
+          {{ ticket.show.theatre.location }}, {{ ticket.show.theatre.city }}
+        </p>
+      </div>
+    </div>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- Seats + Payment + QR -->
+    <div style="display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; align-items:flex-start;">
+
+      <!-- Seats -->
+      <div style="
+          flex:1;
+          min-width:300px;
+          background:#f9fafb;
+          padding:14px;
+          border-radius:16px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; font-weight:900; color:#111827;">
+          💺 Seats & Tickets
+        </p>
+
+        <p style="margin:8px 0 0; color:#6b7280; font-weight:800;">
+          No. of Tickets:
+          <span style="color:#111827; font-weight:900;">{{ ticket.seats.count }}</span>
+        </p>
+
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          {% for s in ticket.seats.all %}
+            <span style="
+                display:inline-block;
+                background:#ffffff;
+                padding:7px 10px;
+                border-radius:10px;
+                font-weight:900;
+                border:1px solid #e5e7eb;
+                color:#111827;
+                font-size:13px;
+            ">
+              {{ s.seat_code }}
+            </span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Payment -->
+      <div style="
+          flex:1;
+          min-width:280px;
+          background:#f9fafb;
+          padding:14px;
+          border-radius:16px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; font-weight:900; color:#111827;">
+          💳 Payment
+        </p>
+
+        <p style="margin:10px 0 0; color:#6b7280; font-weight:800;">
+          Payment Mode:
+          <span style="color:#111827; font-weight:900;">{{ payment_mode }}</span>
+        </p>
+
+        <p style="margin:8px 0 0; color:#6b7280; font-weight:800;">
+          Total Paid:
+          <span style="color:#111827; font-weight:900;">₹{{ ticket.total_price }}</span>
+        </p>
+
+        {% if payment %}
+          <p style="margin:8px 0 0; color:#6b7280; font-weight:800;">
+            Status:
+            <span style="color:#111827; font-weight:900;">{{ payment.status }}</span>
+          </p>
+
+          {% if payment_mode == "Razorpay" %}
+            <p style="margin:8px 0 0; color:#6b7280; font-weight:800;">
+              Order ID:
+              <span style="color:#111827; font-weight:900;">{{ payment.razorpay_order_id }}</span>
+            </p>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- QR -->
+      <div style="
+          min-width:220px;
+          text-align:center;
+          background:#f9fafb;
+          padding:14px;
+          border-radius:16px;
+          border:1px solid #eef2f7;
+      ">
+        <p style="margin:0; font-weight:900; color:#111827;">📌 QR Code</p>
+
+        {% if ticket.qr_image %}
+          <img src="{{ ticket.qr_image.url }}" width="170" style="
+              border-radius:14px;
+              margin-top:10px;
+              border:1px solid #e5e7eb;
+              padding:6px;
+              background:white;
+          ">
+          <p style="margin:8px 0 0; color:#6b7280; font-weight:700; font-size:12px;">
+            Scan at theatre entry ✅
+          </p>
+        {% else %}
+          <p style="margin:10px 0 0; color:#2563eb; font-weight:900;">
+            QR not generated yet
+          </p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- ✅ CLICKABLE STAR RATING SECTION -->
+    <div style="
+        background:#f9fafb;
+        padding:14px;
+        border-radius:16px;
+        border:1px solid #eef2f7;
+        margin-bottom:14px;
+    ">
+      <h3 style="margin:0; font-size:16px; font-weight:900; color:#111827;">
+        ⭐ Rate This Movie
+      </h3>
+
+      {% if ticket.status == "BOOKED" %}
+        {% if now < ticket.show.show_time %}
+          <p style="margin:10px 0 0; color:#6b7280; font-weight:700;">
+            You can rate after the showtime is completed ✅
+          </p>
+        {% else %}
+
+          {% if ticket.rating %}
+            <p style="margin:10px 0 0; color:#111827; font-weight:900;">
+              Your current rating: ⭐ {{ ticket.rating }}/5
+            </p>
+          {% else %}
+            <p style="margin:10px 0 0; color:#6b7280; font-weight:700;">
+              Tap a star to rate your experience ⭐
+            </p>
+          {% endif %}
+
+          <form method="POST" action="{% url 'rate_movie' ticket.id %}" style="margin-top:10px;">
+            {% csrf_token %}
+
+            <input type="hidden" name="rating" id="ratingInput" value="{{ ticket.rating|default:'' }}">
+
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+
+              <div id="starContainer" style="display:flex; gap:6px; align-items:center;">
+                <span class="star" data-value="1" style="font-size:32px; cursor:pointer; color:#d1d5db;">★</span>
+                <span class="star" data-value="2" style="font-size:32px; cursor:pointer; color:#d1d5db;">★</span>
+                <span class="star" data-value="3" style="font-size:32px; cursor:pointer; color:#d1d5db;">★</span>
+                <span class="star" data-value="4" style="font-size:32px; cursor:pointer; color:#d1d5db;">★</span>
+                <span class="star" data-value="5" style="font-size:32px; cursor:pointer; color:#d1d5db;">★</span>
+              </div>
+
+              <span id="ratingLabel" style="
+                  font-weight:900;
+                  color:#111827;
+                  background:white;
+                  padding:6px 12px;
+                  border-radius:999px;
+                  border:1px solid #e5e7eb;
+                  font-size:13px;
+                  display:none;
+              "></span>
+            </div>
+
+            <div style="margin-top:12px;">
+              <button type="submit" id="submitRatingBtn" disabled style="
+                  background:#2563eb;
+                  color:white;
+                  padding:10px 14px;
+                  border-radius:12px;
+                  font-weight:900;
+                  border:none;
+                  cursor:not-allowed;
+                  opacity:0.6;
+              ">
+                Submit Rating
+              </button>
+            </div>
+          </form>
+
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="{% url 'my_tickets' %}" style="
+          background:#111827;
+          color:white;
+          padding:10px 14px;
+          border-radius:12px;
+          font-weight:900;
+          text-decoration:none;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+      ">
+        ⬅ Back
+      </a>
+
+      <button type="button" onclick="shareTicket()" style="
+          background:#2563eb;
+          color:white;
+          padding:10px 14px;
+          border-radius:12px;
+          font-weight:900;
+          border:none;
+          cursor:pointer;
+      ">
+        📤 Share Ticket
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function shareTicket() {
+    const url = window.location.href;
+
+    if (navigator.share) {
+      navigator.share({
+        title: "T-tac Ticket",
+        text: "Here is my T-tac movie ticket booking details:",
+        url: url
+      }).catch((error) => console.log("Share failed:", error));
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        alert("✅ Ticket link copied! Share it anywhere.");
+      }).catch(() => {
+        alert("❌ Unable to copy link. Please copy manually:\n" + url);
+      });
+    }
+  }
+
+  // ✅ Clickable Stars Script
+  (function () {
+    const stars = document.querySelectorAll(".star");
+    const ratingInput = document.getElementById("ratingInput");
+    const ratingLabel = document.getElementById("ratingLabel");
+    const submitBtn = document.getElementById("submitRatingBtn");
+
+    if (!stars.length || !ratingInput || !ratingLabel || !submitBtn) return;
+
+    function getLabel(value) {
+      if (value == 1) return "Bad 😕";
+      if (value == 2) return "Okay 🙂";
+      if (value == 3) return "Good 👍";
+      if (value == 4) return "Great 🔥";
+      if (value == 5) return "Excellent ⭐";
+      return "";
+    }
+
+    function paintStars(value) {
+      stars.forEach(star => {
+        const v = parseInt(star.getAttribute("data-value"));
+        if (v <= value) {
+          star.style.color = "#f59e0b"; // golden
+        } else {
+          star.style.color = "#d1d5db"; // gray
+        }
+      });
+
+      if (value > 0) {
+        ratingLabel.style.display = "inline-flex";
+        ratingLabel.innerText = getLabel(value);
+
+        submitBtn.disabled = false;
+        submitBtn.style.cursor = "pointer";
+        submitBtn.style.opacity = "1";
+      } else {
+        ratingLabel.style.display = "none";
+
+        submitBtn.disabled = true;
+        submitBtn.style.cursor = "not-allowed";
+        submitBtn.style.opacity = "0.6";
+      }
+    }
+
+    // ✅ Load existing rating
+    const existing = parseInt(ratingInput.value || "0");
+    if (existing > 0) paintStars(existing);
+
+    stars.forEach(star => {
+      star.addEventListener("click", function () {
+        const value = parseInt(this.getAttribute("data-value"));
+        ratingInput.value = value;
+        paintStars(value);
+      });
+
+      star.addEventListener("mouseenter", function () {
+        const value = parseInt(this.getAttribute("data-value"));
+        paintStars(value);
+      });
+
+      star.addEventListener("mouseleave", function () {
+        const current = parseInt(ratingInput.value || "0");
+        paintStars(current);
+      });
+    });
+  })();
+</script>
+
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:1050px; margin:auto;">
+
+  <!-- Page Title -->
+  <div style="margin-bottom:16px;">
+    <h2 style="margin:0; font-size:26px; color:#111827;">🎟️ My Tickets</h2>
+    <p style="margin:6px 0 0; color:#6b7280; font-weight:600;">
+      View your bookings, QR codes, and transfer tickets securely.
+    </p>
+  </div>
+
+  {% for t in tickets %}
+  <div style="
+      background:white;
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 6px 18px rgba(15,23,42,0.08);
+      margin-bottom:14px;
+      border:1px solid #eef2f7;
+  ">
+
+    <!-- Header Row -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:240px;">
+
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <p style="margin:0; color:#111827;">
+            <b>🎬 Movie:</b> {{ t.show.movie.title }}
+          </p>
+
+          <p style="margin:0; color:#111827;">
+            <b>🏛 Theatre:</b> {{ t.show.theatre.name }}
+          </p>
+
+          <p style="margin:0; color:#111827;">
+            <b>🕒 Show Time:</b> {{ t.show.show_time|date:"d M Y, h:i A" }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Status Badge + Amount -->
+      <div style="text-align:right; min-width:180px;">
+        <div style="
+            display:inline-block;
+            padding:6px 12px;
+            border-radius:999px;
+            font-weight:900;
+            font-size:12px;
+            background:#eff6ff;
+            color:#1d4ed8;
+            border:1px solid #bfdbfe;
+        ">
+          {{ t.status }}
+        </div>
+
+        <p style="margin:10px 0 0; font-weight:900; font-size:18px; color:#111827;">
+          ₹{{ t.total_price }}
+        </p>
+        <p style="margin:0; color:#6b7280; font-size:12px; font-weight:700;">
+          Total Paid
+        </p>
+      </div>
+    </div>
+
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- Seats + QR -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+
+      <!-- Seats -->
+      <div style="flex:1; min-width:260px;">
+        <p style="margin:0 0 8px; font-weight:900; color:#111827;">
+          💺 Seats ({{ t.seats.count }})
+        </p>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          {% for s in t.seats.all %}
+            <span style="
+                display:inline-block;
+                background:#f3f4f6;
+                padding:7px 10px;
+                border-radius:10px;
+                font-weight:900;
+                color:#111827;
+                font-size:13px;
+            ">
+              {{ s.seat_code }}
+            </span>
+          {% endfor %}
+        </div>
+
+        <!-- Listed Status -->
+        {% if t.status == "BOOKED" %}
+          {% if t.ticketresale and not t.ticketresale.is_sold %}
+            <p style="margin:10px 0 0; font-weight:900; color:#2563eb;">
+              ✅ Listed in Transfer Market
+            </p>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- QR Code -->
+      <div style="text-align:center; min-width:180px;">
+        {% if t.qr_image %}
+          <img src="{{ t.qr_image.url }}" width="140" style="
+              border-radius:12px;
+              border:1px solid #e5e7eb;
+              padding:6px;
+              background:white;
+          ">
+          <p style="margin:6px 0 0; font-size:12px; color:#6b7280; font-weight:700;">
+            Scan at entry
+          </p>
+        {% else %}
+          <p style="margin:0; font-size:13px; color:#6b7280; font-weight:700;">
+            QR not generated
+          </p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    {% if t.status == "BOOKED" %}
+    <hr style="border:none; height:1px; background:#e5e7eb; margin:14px 0;">
+
+    <!-- ✅ Buttons Row -->
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+
+      <!-- ✅ Booking Details button -->
+      <a href="{% url 'ticket_detail' t.id %}" style="
+          background:#f3f4f6;
+          color:#111827;
+          padding:10px 14px;
+          border-radius:12px;
+          font-weight:900;
+          text-decoration:none;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          border:1px solid #e5e7eb;
+      ">
+        Booking Details
+      </a>
+
+      {% if t.ticketresale and not t.ticketresale.is_sold %}
+        <!-- ✅ Cancel listing -->
+        <a href="{% url 'cancel_resale_listing' t.ticketresale.id %}" style="
+            background:#111827;
+            color:white;
+            padding:10px 14px;
+            border-radius:12px;
+            font-weight:900;
+            text-decoration:none;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+        ">
+          Cancel Transfer Listing
+        </a>
+      {% else %}
+        <!-- ✅ Transfer with confirmation -->
+        <a href="{% url 'list_ticket_for_resale' t.id %}"
+           onclick="return confirmTransfer();"
+           style="
+              background:#2563eb;
+              color:white;
+              padding:10px 14px;
+              border-radius:12px;
+              font-weight:900;
+              text-decoration:none;
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+           ">
+          Transfer Ticket
+        </a>
+      {% endif %}
+
+    </div>
+    {% endif %}
+
+  </div>
+  {% empty %}
+    <div style="
+        background:white;
+        border-radius:16px;
+        padding:18px;
+        box-shadow:0 6px 18px rgba(15,23,42,0.08);
+        border:1px solid #eef2f7;
+    ">
+      <p style="margin:0; color:#6b7280; font-weight:800;">
+        No tickets yet.
+      </p>
+    </div>
+  {% endfor %}
+
+</div>
+
+<!-- ✅ Confirmation Script -->
+<script>
+  function confirmTransfer() {
+    return confirm(
+      "Confirm Ticket Transfer Listing ✅\n\n" +
+      "• Ticket will be listed at SAME price only\n" +
+      "• Buyer can purchase only until 3 hours before show time\n\n" +
+      "Do you want to proceed?"
+    );
+  }
+</script>
+
+{% endblock %}
