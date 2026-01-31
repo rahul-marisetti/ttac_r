@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -o errexit
 
-pip install -r ttac_project/requirements.txt
-python ttac_project/manage.py collectstatic --noinput
-python ttac_project/manage.py migrate
+pip install -r requirements.txt
+python manage.py collectstatic --noinput
+python manage.py migrate
