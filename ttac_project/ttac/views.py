@@ -546,6 +546,7 @@ def verify_resale_payment(request, resale_id):
         ticket.user = request.user
         ticket.is_transferred = True
         ticket.save()
+        generate_ticket_qr(ticket, payment_mode="Resale")
 
         resale.buyer = request.user
         resale.is_sold = True
